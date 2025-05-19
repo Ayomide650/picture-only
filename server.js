@@ -1,11 +1,11 @@
 // Server.js - Main entry point for the Discord bot application
 const express = require('express');
 const { Client, GatewayIntentBits, Partials, PermissionsBitField } = require('discord.js');
-require('dotenv').config();
+const config = require('./config');
 
 // Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.server.port;
 
 // Create a new Discord client with necessary intents
 const client = new Client({
@@ -31,7 +31,7 @@ client.on('messageCreate', async (message) => {
   
   // Check if the channel is configured for image-only mode
   const channelId = message.channelId;
-  const imageOnlyChannels = process.env.IMAGE_ONLY_CHANNELS ? process.env.IMAGE_ONLY_CHANNELS.split(',') : [];
+  const imageOnlyChannels = config.discord.imageOnlyChannels;
   
   if (imageOnlyChannels.includes(channelId)) {
     // Check if the user is an admin or has manage messages permission
@@ -51,15 +51,15 @@ client.on('messageCreate', async (message) => {
       try {
         await message.delete();
         const warningMsg = await message.channel.send(
-          `${message.author}, only images are allowed in this channel!`
+          config.bot.warningMessage.replace('{user}', message.author)
         );
         
-        // Delete the warning message after 5 seconds
+        // Delete the warning message after configured timeout
         setTimeout(() => {
           warningMsg.delete().catch(err => 
             console.error(`Failed to delete warning message: ${err}`)
           );
-        }, 5000);
+        }, config.bot.warningMessageTimeout);
       } catch (error) {
         console.error(`Failed to manage message: ${error}`);
       }
@@ -78,4 +78,4 @@ app.listen(PORT, () => {
 });
 
 // Login to Discord
-client.login(process.env.DISCORD_TOKEN);
+client.login(config.discord.token);
