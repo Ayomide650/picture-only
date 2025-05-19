@@ -1,7 +1,7 @@
 {
-  "name": "discord-image-only-bot",
+  "name": "discord-media-only-bot",
   "version": "1.0.0",
-  "description": "A Discord bot that enforces image-only channels",
+  "description": "A Discord bot that enforces image and video-only channels",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
