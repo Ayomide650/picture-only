@@ -17,7 +17,7 @@ const config = {
   // Bot Behavior Configuration
   bot: {
     warningMessageTimeout: 5000, // Time in ms before warning messages are deleted
-    warningMessage: "{user}, only images are allowed in this channel!",
+    warningMessage: "{user}, only images and videos are allowed in this channel!",
   }
 };
 
