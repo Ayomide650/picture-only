@@ -40,14 +40,14 @@ client.on('messageCreate', async (message) => {
     // If user is admin, allow any message
     if (isAdmin) return;
     
-    // Check if message has an image attachment
-    const hasImage = message.attachments.some(attachment => {
+    // Check if message has an image or video attachment
+    const hasMediaContent = message.attachments.some(attachment => {
       const fileType = attachment.contentType;
-      return fileType && fileType.startsWith('image/');
+      return fileType && (fileType.startsWith('image/') || fileType.startsWith('video/'));
     });
     
-    // If no image is found, delete the message and notify the user
-    if (!hasImage) {
+    // If no image or video is found, delete the message and notify the user
+    if (!hasMediaContent) {
       try {
         await message.delete();
         const warningMsg = await message.channel.send(
