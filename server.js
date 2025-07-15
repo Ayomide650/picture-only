@@ -67,14 +67,49 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-// Express route for health check
+// Express routes
 app.get('/', (req, res) => {
   res.send('Image-Only Discord Bot is running!');
 });
 
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'alive', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    bot: client.user ? client.user.tag : 'Not logged in'
+  });
+});
+
+// Self-ping function to keep Render service alive
+function startSelfPing() {
+  const PING_INTERVAL = 14 * 60 * 1000; // 14 minutes in milliseconds
+  
+  setInterval(async () => {
+    try {
+      // Get your Render app URL from environment or construct it
+      const appUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+      const response = await fetch(`${appUrl}/health`);
+      
+      if (response.ok) {
+        console.log(`✅ Self-ping successful: ${response.status} at ${new Date().toISOString()}`);
+      } else {
+        console.log(`⚠️ Self-ping returned: ${response.status}`);
+      }
+    } catch (error) {
+      console.log(`❌ Self-ping failed: ${error.message}`);
+    }
+  }, PING_INTERVAL);
+  
+  console.log(`🔄 Self-ping scheduled every ${PING_INTERVAL / 60000} minutes`);
+}
+
 // Start Express server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  
+  // Start the self-ping mechanism after server starts
+  startSelfPing();
 });
 
 // Login to Discord
